@@ -1072,6 +1072,7 @@
           aiAttachImage: "OCR Image",
           aiOcrReading: "Running OCR...",
           aiOcrDone: "OCR completed: {name}",
+          aiOcrPreview: "Recognized text preview: {preview}",
           aiOcrFailed: "OCR failed: {detail}",
           aiImageTooLarge: "Image is too large. Please upload a PNG, JPG, JPEG, or WEBP image under 5MB.",
           aiImageUnsupported: "Only PNG, JPG, JPEG, and WEBP images are supported for OCR.",
@@ -1193,7 +1194,8 @@
           aiFileReadError: "无法读取该文件，请换一个 .txt 或 .md 文件。",
           aiAttachImage: "图片 OCR",
           aiOcrReading: "正在 OCR...",
-          aiOcrDone: "OCR 完成：{name}",
+          aiOcrDone: "OCR completed: {name}",
+          aiOcrPreview: "Recognized text preview: {preview}",
           aiOcrFailed: "OCR 失败：{detail}",
           aiImageTooLarge: "图片太大，请上传 5MB 以内的 PNG、JPG、JPEG 或 WEBP 图片。",
           aiImageUnsupported: "图片 OCR 仅支持 PNG、JPG、JPEG 和 WEBP。",
@@ -1329,7 +1331,34 @@
         context.fillStyle = "#ffffff";
         context.fillRect(0, 0, width, height);
         context.drawImage(image, 0, 0, width, height);
-        return canvas.toDataURL("image/jpeg", 0.9);
+
+        const blob = await new Promise((resolve, reject) => {
+          canvas.toBlob((result) => {
+            if (result) {
+              resolve(result);
+            } else {
+              reject(new Error("Could not compress image"));
+            }
+          }, "image/jpeg", 0.85);
+        });
+
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.addEventListener("load", () => resolve(String(reader.result || "")));
+          reader.addEventListener("error", reject);
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      function cleanOcrText(text) {
+        return String(text || "").replace(/\s+/g, " ").trim();
+      }
+
+      function hasReadableOcrText(text) {
+        if (text.length < 5) {
+          return false;
+        }
+        return /[\p{L}\p{N}]/u.test(text);
       }
 
       function ocrErrorMessage(detail) {
@@ -1414,12 +1443,12 @@
             try {
               const originalDataUrl = String(reader.result || "");
               const processedDataUrl = await preprocessImageForOcr(originalDataUrl);
-              const response = await fetch("/api/ocr", {
+              const response = await fetch("/api/vision-ocr", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ img: processedDataUrl })
+                body: JSON.stringify({ image: processedDataUrl })
               });
 
               const data = await response.json().catch(() => ({}));
@@ -1427,17 +1456,19 @@
                 throw new Error(data.detail || data.error || "OCR request failed");
               }
 
-              const text = typeof data.text === "string" ? data.text.trim() : "";
-              if (!text) {
-                throw new Error("OCR 未识别到文字，请尝试更清晰、对比度更高的图片。 ");
+              const cleaned = cleanOcrText(data.text);
+              if (!hasReadableOcrText(cleaned)) {
+                throw new Error("OCR did not recognize readable text.");
               }
 
+              const limited = cleaned.slice(0, 4000);
+              console.log("OCR preview:", limited);
               fileContext = {
                 sourceType: "ocr",
                 filename: file.name,
-                content: text.slice(0, MAX_FILE_CONTEXT_CHARS)
+                content: limited
               };
-              setFileStatus(t("aiOcrDone").replace("{name}", file.name), false);
+              setFileStatus(`${t("aiOcrDone").replace("{name}", file.name)}\n${t("aiOcrPreview").replace("{preview}", limited.slice(0, 200))}`, false);
             } catch (error) {
               fileContext = null;
               imageInput.value = "";

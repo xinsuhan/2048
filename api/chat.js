@@ -234,15 +234,21 @@ module.exports = async function handler(req, res) {
       })
     });
 
-    if (!deepseekResponse.ok) {
-      console.error("DeepSeek API request failed", deepseekResponse.status);
-      return res.status(502).json({
-        error: "AI service is unavailable",
-        detail: `DeepSeek returned ${deepseekResponse.status}`
-      });
+    const deepseekText = await deepseekResponse.text();
+    let data;
+    try {
+      data = JSON.parse(deepseekText);
+    } catch (error) {
+      data = { raw: deepseekText.slice(0, 1000) };
     }
 
-    const data = await deepseekResponse.json();
+    if (!deepseekResponse.ok) {
+      console.error("DeepSeek error:", data);
+      return res.status(502).json({
+        error: "chat_failed",
+        detail: data?.error?.message || data?.message || `DeepSeek returned ${deepseekResponse.status}`
+      });
+    }
     const reply = data.choices?.[0]?.message?.content?.trim();
 
     if (!reply) {
@@ -251,7 +257,10 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({ reply });
   } catch (error) {
-    console.error("Chat API error", error.message);
-    return res.status(500).json({ error: "AI service is unavailable" });
+    console.error("DeepSeek error:", { message: error.message });
+    return res.status(500).json({
+      error: "chat_failed",
+      detail: error.message || "AI service is unavailable"
+    });
   }
 };
