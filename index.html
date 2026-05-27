@@ -921,6 +921,8 @@
           >
           <input class="ai-file-input" id="ai-file" type="file" accept=".txt,.md,text/plain,text/markdown">
           <label class="button" for="ai-file" data-i18n="aiAttachFile">Attach .txt / .md</label>
+          <input class="ai-file-input" id="ai-image" type="file" accept="image/png,image/jpeg,image/webp">
+          <label class="button" for="ai-image" data-i18n="aiAttachImage">OCR Image</label>
           <button class="button primary" type="submit" id="ai-send" data-i18n="aiSend">Send</button>
         </form>
       </div>
@@ -1067,6 +1069,12 @@
           aiFileTooLarge: "File is too large. Please upload a .txt or .md file under 1MB.",
           aiFileUnsupported: "Only .txt and .md files are supported.",
           aiFileReadError: "Could not read this file. Please try another .txt or .md file.",
+          aiAttachImage: "OCR Image",
+          aiOcrReading: "Running OCR...",
+          aiOcrDone: "OCR completed: {name}",
+          aiOcrFailed: "OCR failed. Please try another image.",
+          aiImageTooLarge: "Image is too large. Please upload a PNG, JPG, JPEG, or WEBP image under 5MB.",
+          aiImageUnsupported: "Only PNG, JPG, JPEG, and WEBP images are supported for OCR.",
           aiThinking: "Thinking...",
           aiError: "The AI service is temporarily unavailable. Please try again later.",          contactTitle: "Contact",
           contactDescription: "Reach me through email, GitHub, or this personal website.",
@@ -1183,6 +1191,12 @@
           aiFileTooLarge: "文件太大，请上传 1MB 以内的 .txt 或 .md 文件。",
           aiFileUnsupported: "目前只支持 .txt 和 .md 文件。",
           aiFileReadError: "无法读取该文件，请换一个 .txt 或 .md 文件。",
+          aiAttachImage: "图片 OCR",
+          aiOcrReading: "正在 OCR...",
+          aiOcrDone: "OCR 完成：{name}",
+          aiOcrFailed: "OCR 失败，请换一张图片再试。",
+          aiImageTooLarge: "图片太大，请上传 5MB 以内的 PNG、JPG、JPEG 或 WEBP 图片。",
+          aiImageUnsupported: "图片 OCR 仅支持 PNG、JPG、JPEG 和 WEBP。",
           aiThinking: "正在思考...",
           aiError: "AI 服务暂时不可用，请稍后再试。",          contactTitle: "联系",
           contactDescription: "可通过邮件、GitHub 或个人网站联系我。",
@@ -1261,10 +1275,12 @@
       const input = document.getElementById("ai-input");
       const sendButton = document.getElementById("ai-send");
       const fileInput = document.getElementById("ai-file");
+      const imageInput = document.getElementById("ai-image");
       const fileStatus = document.getElementById("ai-file-status");
       const conversationMessages = [];
       const MAX_HISTORY_TURNS = 6;
       const MAX_FILE_SIZE_BYTES = 1024 * 1024;
+      const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
       const MAX_FILE_CONTEXT_CHARS = 8000;
       let fileContext = null;
 
@@ -1285,6 +1301,10 @@
 
       function isSupportedTextFile(file) {
         return /\.(txt|md)$/i.test(file.name);
+      }
+
+      function isSupportedImageFile(file) {
+        return /\.(png|jpe?g|webp)$/i.test(file.name) && /^image\/(png|jpeg|webp)$/.test(file.type);
       }
 
       function addMessage(text, type) {
@@ -1333,6 +1353,71 @@
             setFileStatus(t("aiFileReadError"), true);
           });
           reader.readAsText(file);
+        });
+      }
+
+      if (imageInput) {
+        imageInput.addEventListener("change", () => {
+          const file = imageInput.files && imageInput.files[0];
+          fileContext = null;
+          setFileStatus("");
+
+          if (!file) {
+            return;
+          }
+
+          if (!isSupportedImageFile(file)) {
+            imageInput.value = "";
+            setFileStatus(t("aiImageUnsupported"), true);
+            return;
+          }
+
+          if (file.size > MAX_IMAGE_SIZE_BYTES) {
+            imageInput.value = "";
+            setFileStatus(t("aiImageTooLarge"), true);
+            return;
+          }
+
+          setFileStatus(t("aiOcrReading"), false);
+          const reader = new FileReader();
+          reader.addEventListener("load", async () => {
+            try {
+              const dataUrl = String(reader.result || "");
+              const response = await fetch("/api/ocr", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ img: dataUrl })
+              });
+
+              if (!response.ok) {
+                throw new Error("OCR request failed");
+              }
+
+              const data = await response.json();
+              const text = typeof data.text === "string" ? data.text.trim() : "";
+              if (!text) {
+                throw new Error("Empty OCR response");
+              }
+
+              fileContext = {
+                name: file.name,
+                content: text.slice(0, MAX_FILE_CONTEXT_CHARS)
+              };
+              setFileStatus(t("aiOcrDone").replace("{name}", file.name), false);
+            } catch (error) {
+              fileContext = null;
+              imageInput.value = "";
+              setFileStatus(t("aiOcrFailed"), true);
+            }
+          });
+          reader.addEventListener("error", () => {
+            fileContext = null;
+            imageInput.value = "";
+            setFileStatus(t("aiOcrFailed"), true);
+          });
+          reader.readAsDataURL(file);
         });
       }
 
