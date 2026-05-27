@@ -5,6 +5,7 @@ const MAX_HISTORY_MESSAGES = MAX_HISTORY_TURNS * 2;
 const MAX_FILE_CONTEXT_LENGTH = 8000;
 const MAX_FILE_NAME_LENGTH = 200;
 const ALLOWED_HISTORY_ROLES = new Set(["user", "assistant"]);
+const ALLOWED_CONTEXT_SOURCE_TYPES = new Set(["text", "ocr"]);
 
 const systemPrompt = `你是 xinsuhan.top 的网站 AI 助手。请用简洁、友好的中文回答用户问题。你可以介绍这个网站、站长的项目、学习方向和页面内容，但不要编造不存在的信息。
 
@@ -121,25 +122,42 @@ function normalizeFileContext(fileContext) {
   }
 
   if (!fileContext || typeof fileContext !== "object" || Array.isArray(fileContext)) {
-    throw new Error("Invalid file context");
+    throw new Error("Invalid fileContext: expected an object");
   }
 
-  const name = typeof fileContext.name === "string" ? fileContext.name.trim() : "";
+  const sourceType = typeof fileContext.sourceType === "string" ? fileContext.sourceType.trim() : "text";
+  const filename = typeof fileContext.filename === "string"
+    ? fileContext.filename.trim()
+    : typeof fileContext.name === "string"
+      ? fileContext.name.trim()
+      : "";
   const content = typeof fileContext.content === "string" ? fileContext.content.trim() : "";
 
-  if (!name || !/\.(txt|md)$/i.test(name)) {
-    throw new Error("Unsupported file type");
+  if (!ALLOWED_CONTEXT_SOURCE_TYPES.has(sourceType)) {
+    throw new Error("Invalid fileContext: unsupported sourceType");
   }
 
-  if (name.length > MAX_FILE_NAME_LENGTH || content.length > MAX_FILE_CONTEXT_LENGTH) {
-    throw new Error("Invalid file context length");
+  if (!filename || filename.length > MAX_FILE_NAME_LENGTH) {
+    throw new Error("Invalid fileContext: invalid filename");
+  }
+
+  if (sourceType === "text" && !/\.(txt|md)$/i.test(filename)) {
+    throw new Error("Invalid fileContext: text context must come from .txt or .md");
+  }
+
+  if (sourceType === "ocr" && !/\.(png|jpe?g|webp)$/i.test(filename)) {
+    throw new Error("Invalid fileContext: OCR context must come from an image");
   }
 
   if (!content) {
-    return null;
+    throw new Error("Invalid fileContext: empty content");
   }
 
-  return { name, content };
+  if (content.length > MAX_FILE_CONTEXT_LENGTH) {
+    throw new Error("Invalid fileContext: content is too long");
+  }
+
+  return { sourceType, filename, content };
 }
 
 function buildFileContextMessage(fileContext) {
@@ -147,10 +165,14 @@ function buildFileContextMessage(fileContext) {
     return [];
   }
 
+  const label = fileContext.sourceType === "ocr"
+    ? "图片 OCR 识别文本"
+    : "用户上传的临时文本文件内容";
+
   return [
     {
       role: "user",
-      content: `以下是用户上传的临时文本文件内容，仅用于回答当前问题。不要声称该文件已被保存。文件名：${fileContext.name}\n\n${fileContext.content}`
+      content: `以下是${label}，仅用于回答当前问题。不要声称该文件已被保存。文件名：${fileContext.filename}\n\n${fileContext.content}`
     }
   ];
 }
@@ -170,7 +192,10 @@ module.exports = async function handler(req, res) {
     historyMessages = normalizeHistory(body.history);
     fileContextMessages = buildFileContextMessage(normalizeFileContext(body.fileContext));
   } catch (error) {
-    return res.status(400).json({ error: "Invalid request body" });
+    return res.status(400).json({
+      error: "Invalid request body",
+      detail: error.message
+    });
   }
 
   if (!message) {
@@ -211,7 +236,10 @@ module.exports = async function handler(req, res) {
 
     if (!deepseekResponse.ok) {
       console.error("DeepSeek API request failed", deepseekResponse.status);
-      return res.status(502).json({ error: "AI service is unavailable" });
+      return res.status(502).json({
+        error: "AI service is unavailable",
+        detail: `DeepSeek returned ${deepseekResponse.status}`
+      });
     }
 
     const data = await deepseekResponse.json();

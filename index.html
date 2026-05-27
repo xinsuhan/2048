@@ -1072,7 +1072,7 @@
           aiAttachImage: "OCR Image",
           aiOcrReading: "Running OCR...",
           aiOcrDone: "OCR completed: {name}",
-          aiOcrFailed: "OCR failed. Please try another image.",
+          aiOcrFailed: "OCR failed: {detail}",
           aiImageTooLarge: "Image is too large. Please upload a PNG, JPG, JPEG, or WEBP image under 5MB.",
           aiImageUnsupported: "Only PNG, JPG, JPEG, and WEBP images are supported for OCR.",
           aiThinking: "Thinking...",
@@ -1194,7 +1194,7 @@
           aiAttachImage: "图片 OCR",
           aiOcrReading: "正在 OCR...",
           aiOcrDone: "OCR 完成：{name}",
-          aiOcrFailed: "OCR 失败，请换一张图片再试。",
+          aiOcrFailed: "OCR 失败：{detail}",
           aiImageTooLarge: "图片太大，请上传 5MB 以内的 PNG、JPG、JPEG 或 WEBP 图片。",
           aiImageUnsupported: "图片 OCR 仅支持 PNG、JPG、JPEG 和 WEBP。",
           aiThinking: "正在思考...",
@@ -1307,6 +1307,35 @@
         return /\.(png|jpe?g|webp)$/i.test(file.name) && /^image\/(png|jpeg|webp)$/.test(file.type);
       }
 
+      function loadImage(dataUrl) {
+        return new Promise((resolve, reject) => {
+          const image = new Image();
+          image.addEventListener("load", () => resolve(image));
+          image.addEventListener("error", reject);
+          image.src = dataUrl;
+        });
+      }
+
+      async function preprocessImageForOcr(dataUrl) {
+        const image = await loadImage(dataUrl);
+        const longestSide = Math.max(image.naturalWidth, image.naturalHeight);
+        const scale = longestSide > 1600 ? 1600 / longestSide : 1;
+        const width = Math.max(1, Math.round(image.naturalWidth * scale));
+        const height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, width, height);
+        context.drawImage(image, 0, 0, width, height);
+        return canvas.toDataURL("image/jpeg", 0.9);
+      }
+
+      function ocrErrorMessage(detail) {
+        return t("aiOcrFailed").replace("{detail}", detail || "Unknown error");
+      }
+
       function addMessage(text, type) {
         const message = document.createElement("p");
         message.className = `ai-message ${type || ""}`.trim();
@@ -1342,7 +1371,8 @@
           reader.addEventListener("load", () => {
             const content = String(reader.result || "").slice(0, MAX_FILE_CONTEXT_CHARS);
             fileContext = {
-              name: file.name,
+              sourceType: "text",
+              filename: file.name,
               content
             };
             setFileStatus(t("aiFileReady").replace("{name}", file.name), false);
@@ -1382,40 +1412,42 @@
           const reader = new FileReader();
           reader.addEventListener("load", async () => {
             try {
-              const dataUrl = String(reader.result || "");
+              const originalDataUrl = String(reader.result || "");
+              const processedDataUrl = await preprocessImageForOcr(originalDataUrl);
               const response = await fetch("/api/ocr", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ img: dataUrl })
+                body: JSON.stringify({ img: processedDataUrl })
               });
 
+              const data = await response.json().catch(() => ({}));
               if (!response.ok) {
-                throw new Error("OCR request failed");
+                throw new Error(data.detail || data.error || "OCR request failed");
               }
 
-              const data = await response.json();
               const text = typeof data.text === "string" ? data.text.trim() : "";
               if (!text) {
-                throw new Error("Empty OCR response");
+                throw new Error("OCR 未识别到文字，请尝试更清晰、对比度更高的图片。 ");
               }
 
               fileContext = {
-                name: file.name,
+                sourceType: "ocr",
+                filename: file.name,
                 content: text.slice(0, MAX_FILE_CONTEXT_CHARS)
               };
               setFileStatus(t("aiOcrDone").replace("{name}", file.name), false);
             } catch (error) {
               fileContext = null;
               imageInput.value = "";
-              setFileStatus(t("aiOcrFailed"), true);
+              setFileStatus(ocrErrorMessage(error.message), true);
             }
           });
           reader.addEventListener("error", () => {
             fileContext = null;
             imageInput.value = "";
-            setFileStatus(t("aiOcrFailed"), true);
+            setFileStatus(ocrErrorMessage("Could not read image"), true);
           });
           reader.readAsDataURL(file);
         });
