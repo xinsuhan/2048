@@ -3850,6 +3850,18 @@
       return showCardFaces;
     }
 
+    function resolveCardImageUrl(src) {
+      if (!src) return "";
+      const base = window.location.href.endsWith("/")
+        ? window.location.href
+        : `${window.location.href}/`;
+      try {
+        return new URL(src, base).toString();
+      } catch (error) {
+        return src;
+      }
+    }
+
     function applyCardFace(el, name) {
       const src = getCardImage(name);
       const normalized = normalizePlayedText(name);
@@ -3867,8 +3879,13 @@
         return;
       }
       if (src && shouldShowFace()) {
+        const resolvedSrc = resolveCardImageUrl(src);
         el.classList.add("has-face");
-        el.style.background = `#fff url(${src}) center center / cover no-repeat`;
+        el.style.backgroundImage = `url("${resolvedSrc}")`;
+        el.style.backgroundColor = "#fff";
+        el.style.backgroundPosition = "center center";
+        el.style.backgroundSize = "cover";
+        el.style.backgroundRepeat = "no-repeat";
         el.textContent = name;
         el.setAttribute("aria-label", name);
         el.title = name;
