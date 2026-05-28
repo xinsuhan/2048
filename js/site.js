@@ -59,7 +59,7 @@
       mcmTag: "MCM / ICM",
       mcmTitle: "2026 MCM/ICM — Honorable Mention",
       mcmDescription:
-        "Honorable Mention in the 2026 Mathematical Contest in Modeling (MCM/ICM). Certificate and paper available below.",
+        "Honorable Mention in the 2026 Mathematical Contest in Modeling (MCM/ICM), recognizing outstanding modeling work.",
       mcmKeywords: "Mathematical Modeling · Fairness Analysis · Vote Reconstruction",
       buttonViewCertificate: "View Certificate",
       buttonReadPaper: "Read Paper",
@@ -190,7 +190,7 @@
       mcmTag: "MCM / ICM",
       mcmTitle: "2026 MCM/ICM — 优秀奖",
       mcmDescription:
-        "在 2026 年美国大学生数学建模竞赛中获得优秀奖，证书与论文可在下方查看。",
+        "在 2026 年美国大学生数学建模竞赛中获得优秀奖，表彰建模成果。",
       mcmKeywords: "数学建模 · 公平性分析 · 投票重构",
       buttonViewCertificate: "查看证书",
       buttonReadPaper: "阅读论文",
