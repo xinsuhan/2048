@@ -226,10 +226,10 @@
         </p>
       </div>
 
-      <div class="project-search" role="search" aria-label="Project search">
-        <label class="project-search-label" for="project-search-input">Search projects</label>
+      <div class="project-search" role="search" aria-label="Project search" data-i18n-aria-label="projectSearchRegionLabel">
+        <label class="project-search-label" for="project-search-input" data-i18n="projectSearchLabel">Search projects</label>
         <div class="project-search-box">
-          <button class="project-search-icon" id="project-search-submit" type="button" aria-label="Search projects">
+          <button class="project-search-icon" id="project-search-submit" type="button" aria-label="Search projects" data-i18n-aria-label="projectSearchButton">
             &#128269;
           </button>
           <input
@@ -237,11 +237,14 @@
             id="project-search-input"
             type="search"
             autocomplete="off"
+            aria-label="Search projects"
+            data-i18n-aria-label="projectSearchLabel"
+            data-i18n-placeholder="projectSearchPlaceholder"
             placeholder="Search projects by name, description, or tag"
           >
-          <button class="project-search-clear" id="project-search-clear" type="button" aria-label="Clear project search">&times;</button>
+          <button class="project-search-clear" id="project-search-clear" type="button" aria-label="Clear project search" data-i18n-aria-label="projectSearchClear">&times;</button>
         </div>
-        <div class="project-filters" role="group" aria-label="Project filters">
+        <div class="project-filters" role="group" aria-label="Project filters" data-i18n-aria-label="projectFiltersLabel">
           <button class="project-filter active" type="button" data-filter="all" aria-pressed="true" data-i18n="filterAll">All</button>
           <button class="project-filter" type="button" data-filter="modeling" aria-pressed="false" data-i18n="filterModeling">Modeling</button>
           <button class="project-filter" type="button" data-filter="research" aria-pressed="false" data-i18n="filterResearch">Research</button>
@@ -251,7 +254,7 @@
           <button class="project-filter" type="button" data-filter="cs" aria-pressed="false" data-i18n="filterCs">CS</button>
         </div>
         <p class="project-search-count" id="project-search-count" aria-live="polite"></p>
-        <p class="project-search-empty" id="project-search-empty" hidden>未找到相关项目</p>
+        <p class="project-search-empty" id="project-search-empty" hidden data-i18n="projectSearchEmpty">No matching projects found.</p>
       </div>
 
       <div class="project-grid">
@@ -374,13 +377,15 @@
             type="text"
             maxlength="1000"
             autocomplete="off"
+            aria-label="Ask the AI assistant"
+            data-i18n-aria-label="aiInputLabel"
             data-i18n-placeholder="aiPlaceholder"
             placeholder="Ask something about this site..."
           >
           <input class="ai-file-input" id="ai-file" type="file" accept=".txt,.md,text/plain,text/markdown">
-          <label class="button" for="ai-file" data-i18n="aiAttachFile">Attach .txt / .md</label>
+          <button class="button" id="ai-file-button" type="button" aria-label="Attach a text or markdown file" data-i18n="aiAttachFile" data-i18n-aria-label="aiAttachFileLabel">Attach .txt / .md</button>
           <input class="ai-file-input" id="ai-image" type="file" accept="image/png,image/jpeg,image/webp">
-          <label class="button" for="ai-image" data-i18n="aiAttachImage">OCR Image</label>
+          <button class="button" id="ai-image-button" type="button" aria-label="Upload an image for OCR" data-i18n="aiAttachImage" data-i18n-aria-label="aiAttachImageLabel">OCR Image</button>
           <button class="button primary" type="submit" id="ai-send" data-i18n="aiSend">Send</button>
         </form>
       </div>
@@ -410,8 +415,8 @@
 
     <section class="guestbook-section" id="guestbook" aria-labelledby="guestbook-title">
       <div class="section-head">
-        <h2 id="guestbook-title">Guestbook</h2>
-        <p>欢迎留言交流，评论由 GitHub Discussions 提供支持。</p>
+        <h2 id="guestbook-title" data-i18n="guestbookTitle">Guestbook</h2>
+        <p data-i18n="guestbookDescription">Leave a note or start a conversation. Comments are powered by GitHub Discussions.</p>
       </div>
       <div
         class="guestbook-card"
@@ -425,7 +430,7 @@
         data-reactions-enabled="1"
         data-emit-metadata="0"
         data-input-position="bottom"
-        data-lang="zh-CN"
+        data-lang="en"
       ></div>
     </section>
   </main>

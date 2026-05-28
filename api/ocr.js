@@ -52,6 +52,7 @@ module.exports = async function handler(req, res) {
   });
 
   try {
+    const startedAt = Date.now();
     const ocrResponse = await fetch(OCR_API_URL, {
       method: "POST",
       headers: {
@@ -65,7 +66,7 @@ module.exports = async function handler(req, res) {
     const responseText = await ocrResponse.text();
     console.info("OCR response", {
       status: ocrResponse.status,
-      preview: responseText.slice(0, 200)
+      durationMs: Date.now() - startedAt
     });
 
     if (!ocrResponse.ok) {

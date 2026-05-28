@@ -3,13 +3,55 @@
   const THEME_STORAGE_KEY = "homeTheme";
   const API_BASE = (window.API_BASE || document.documentElement.getAttribute("data-api-base") || "").trim();
   const API_ROOT = API_BASE ? API_BASE.replace(/\/$/, "") : "";
+  const IS_API_CONFIGURED = Boolean(API_ROOT);
+  const reducedMotionQuery = typeof window.matchMedia === "function"
+    ? window.matchMedia("(prefers-reduced-motion: reduce)")
+    : { matches: false };
+
+  function getStorageItem(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function setStorageItem(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      return false;
+    }
+    return true;
+  }
+
+  function scrollBehavior() {
+    return reducedMotionQuery.matches ? "auto" : "smooth";
+  }
+
+  function scrollToTarget(target, options) {
+    if (!target || typeof target.scrollIntoView !== "function") {
+      return;
+    }
+    target.scrollIntoView({
+      ...options,
+      behavior: scrollBehavior()
+    });
+  }
+
+  function scrollWindowTo(options) {
+    window.scrollTo({
+      ...options,
+      behavior: scrollBehavior()
+    });
+  }
 
   function buildApiUrl(path) {
     if (!path) {
       return API_ROOT || "";
     }
     if (!API_ROOT) {
-      return path.startsWith("/") ? path : `/${path}`;
+      return "";
     }
     return path.startsWith("/") ? `${API_ROOT}${path}` : `${API_ROOT}/${path}`;
   }
@@ -78,6 +120,15 @@
       gamesTitle: "Projects & Games",
       gamesDescription:
         "Academic projects, web experiments, and browser games collected under this personal site.",
+      projectSearchRegionLabel: "Project search",
+      projectSearchLabel: "Search projects",
+      projectSearchButton: "Search projects",
+      projectSearchClear: "Clear project search",
+      projectSearchPlaceholder: "Search projects by name, description, or tag",
+      projectFiltersLabel: "Project filters",
+      projectSearchCount: "{shown} / {total} projects",
+      projectSearchTotal: "{total} projects",
+      projectSearchEmpty: "No matching projects found.",
       filterAll: "All",
       filterModeling: "Modeling",
       filterResearch: "Research",
@@ -207,7 +258,14 @@
       aiThinkingGenerating: "Generating the answer, please wait...",
       aiThinkingUploads: "Organizing uploaded content...",
       aiThinkingElapsed: "Waiting {seconds}s",
-      aiError: "The AI service is temporarily unavailable. Please try again later.",          contactTitle: "Contact",
+      aiError: "The AI service is temporarily unavailable. Please try again later.",
+      aiUnavailable: "AI and OCR are unavailable because no API base is configured.",
+      aiInputLabel: "Ask the AI assistant",
+      aiAttachFileLabel: "Attach a text or markdown file",
+      aiAttachImageLabel: "Upload an image for OCR",
+      guestbookTitle: "Guestbook",
+      guestbookDescription: "Leave a note or start a conversation. Comments are powered by GitHub Discussions.",
+      contactTitle: "Contact",
       contactDescription: "Reach me through email, GitHub, or this personal website.",
       contactNote: "Open to learning projects, collaboration, and technical discussions.",
       contactEmailLabel: "Email",
@@ -276,13 +334,15 @@
       calculusDescription: "在四川大学大一学年取得微积分 I 100/100。",
       gamesTitle: "项目与游戏",
       gamesDescription: "个人站点收录的学术项目、Web 实验与浏览器小游戏。",
-        filterAll: "全部",
-        filterModeling: "建模",
-        filterResearch: "研究",
-        filterWeb: "Web",
-        filterGame: "游戏",
-        filterCoursework: "课程",
-        filterCs: "计算机",
+      projectSearchRegionLabel: "项目搜索",
+      projectSearchLabel: "搜索项目",
+      projectSearchButton: "搜索项目",
+      projectSearchClear: "清空项目搜索",
+      projectSearchPlaceholder: "按名称、描述或标签搜索项目",
+      projectFiltersLabel: "项目筛选",
+      projectSearchCount: "{shown} / {total} 个项目",
+      projectSearchTotal: "共 {total} 个项目",
+      projectSearchEmpty: "未找到相关项目。",
       filterAll: "全部",
       filterModeling: "建模",
       filterResearch: "研究",
@@ -402,7 +462,14 @@
       aiThinkingGenerating: "正在生成回答，请稍等...",
       aiThinkingUploads: "正在整理上传内容...",
       aiThinkingElapsed: "已等待 {seconds} 秒",
-      aiError: "AI 服务暂时不可用，请稍后再试。",          contactTitle: "联系",
+      aiError: "AI 服务暂时不可用，请稍后再试。",
+      aiUnavailable: "尚未配置 API 地址，AI 与 OCR 功能暂不可用。",
+      aiInputLabel: "向 AI 助手提问",
+      aiAttachFileLabel: "上传文本或 Markdown 文件",
+      aiAttachImageLabel: "上传图片进行 OCR",
+      guestbookTitle: "留言板",
+      guestbookDescription: "欢迎留言交流，评论由 GitHub Discussions 提供支持。",
+      contactTitle: "联系",
       contactDescription: "可通过邮件、GitHub 或个人网站联系我。",
       contactNote: "欢迎交流学习项目、合作想法和技术问题。",
       contactEmailLabel: "邮箱",
@@ -435,12 +502,8 @@
     : { matches: false };
 
   function getStoredTheme() {
-    try {
-      const value = localStorage.getItem(THEME_STORAGE_KEY);
-      return value === "dark" || value === "light" ? value : "";
-    } catch (error) {
-      return "";
-    }
+    const value = getStorageItem(THEME_STORAGE_KEY);
+    return value === "dark" || value === "light" ? value : "";
   }
 
   function getPreferredTheme() {
@@ -452,11 +515,7 @@
     document.documentElement.setAttribute("data-theme", normalized);
 
     if (persist) {
-      try {
-        localStorage.setItem(THEME_STORAGE_KEY, normalized);
-      } catch (error) {
-        console.warn("Could not save theme preference:", error);
-      }
+      setStorageItem(THEME_STORAGE_KEY, normalized);
     }
 
     if (themeButton) {
@@ -547,12 +606,34 @@
     }
     if (projectSearch.count) {
       projectSearch.count.textContent = hasFilters
-        ? `${matches.length} / ${projectSearch.items.length} projects`
-        : `${projectSearch.items.length} projects`;
+        ? t("projectSearchCount")
+          .replace("{shown}", String(matches.length))
+          .replace("{total}", String(projectSearch.items.length))
+        : t("projectSearchTotal").replace("{total}", String(projectSearch.items.length));
     }
     if (projectSearch.empty) {
       projectSearch.empty.hidden = !hasFilters || matches.length > 0;
     }
+  }
+
+  function getProjectMatches(query, activeTag) {
+    const normalizedQuery = normalizeSearchText(query);
+    const normalizedTag = activeTag || "all";
+    return projectSearch.items.filter((item) => {
+      const matchesQuery = !normalizedQuery || item.haystack.includes(normalizedQuery);
+      const matchesTag = normalizedTag === "all" || item.filterTags.includes(normalizedTag);
+      return matchesQuery && matchesTag;
+    });
+  }
+
+  function isHighConfidenceProjectMatch(item, query) {
+    const normalizedQuery = normalizeSearchText(query);
+    if (!normalizedQuery) {
+      return false;
+    }
+
+    const title = normalizeSearchText(item.title);
+    return title === normalizedQuery || title.includes(normalizedQuery);
   }
 
   function setActiveProjectFilter(tag) {
@@ -578,20 +659,21 @@
     }
 
     filterProjects();
-    if (!projectSearch.matches.length) {
+    const currentMatches = getProjectMatches(query, projectSearch.activeTag);
+    if (!currentMatches.length) {
       return;
     }
 
-    const firstMatch = projectSearch.matches[0].card;
-    if (projectSearch.matches.length === 1) {
-      const primaryLink = firstMatch.querySelector(".button.primary, a");
+    const confidentMatches = currentMatches.filter((item) => isHighConfidenceProjectMatch(item, query));
+    if (confidentMatches.length === 1) {
+      const primaryLink = confidentMatches[0].card.querySelector(".button.primary, a");
       if (primaryLink && primaryLink.href) {
         window.location.href = primaryLink.href;
         return;
       }
     }
 
-    firstMatch.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollToTarget(currentMatches[0].card, { block: "start" });
   }
 
   function clearProjectSearch() {
@@ -623,7 +705,7 @@
         clearProjectSearch();
         return;
       }
-      if (event.key === "Enter" && projectSearch.input.value) {
+      if (event.key === "Enter") {
         event.preventDefault();
         handleProjectSearchSubmit();
       }
@@ -652,7 +734,7 @@
 
     window.addEventListener("scroll", updateVisibility, { passive: true });
     backToTopButton.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollWindowTo({ top: 0 });
     });
     updateVisibility();
   }
@@ -680,6 +762,25 @@
     }, "https://giscus.app");
   }
 
+  function getGiscusLang(lang) {
+    return normalizeLang(lang || currentLang()) === "zh" ? "zh-CN" : "en";
+  }
+
+  function syncGiscusLanguage(lang) {
+    const iframe = document.querySelector("iframe.giscus-frame");
+    if (!iframe) {
+      return;
+    }
+
+    iframe.contentWindow.postMessage({
+      giscus: {
+        setConfig: {
+          lang: getGiscusLang(lang)
+        }
+      }
+    }, "https://giscus.app");
+  }
+
   function loadGiscus() {
     if (!giscusThread || isGiscusLoaded) {
       return;
@@ -700,7 +801,7 @@
     script.setAttribute("data-emit-metadata", giscusThread.dataset.emitMetadata || "0");
     script.setAttribute("data-input-position", giscusThread.dataset.inputPosition || "bottom");
     script.setAttribute("data-theme", getGiscusTheme(currentTheme()));
-    script.setAttribute("data-lang", giscusThread.dataset.lang || "zh-CN");
+    script.setAttribute("data-lang", getGiscusLang());
     script.setAttribute("data-loading", "lazy");
     giscusThread.appendChild(script);
   }
@@ -759,6 +860,13 @@
         element.setAttribute("placeholder", text);
       }
     });
+    document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+      const key = element.getAttribute("data-i18n-aria-label");
+      const text = dictionary[key];
+      if (text) {
+        element.setAttribute("aria-label", text);
+      }
+    });
     buttons.forEach((button) => {
       const isActive = button.getAttribute("data-lang-option") === lang;
       button.classList.toggle("active", isActive);
@@ -766,17 +874,24 @@
     });
     buildProjectSearchIndex();
     filterProjects();
+    if (giscusThread) {
+      giscusThread.dataset.lang = getGiscusLang(lang);
+    }
+    syncGiscusLanguage(lang);
   }
 
   function setLanguage(lang, persist) {
     const normalized = normalizeLang(lang);
     applyTranslations(normalized);
     if (persist) {
-      localStorage.setItem(STORAGE_KEY, normalized);
+      setStorageItem(STORAGE_KEY, normalized);
+    }
+    if (!IS_API_CONFIGURED) {
+      setFileStatus(t("aiUnavailable"), true);
     }
   }
 
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const stored = getStorageItem(STORAGE_KEY);
   const browserLang = (navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en";
   const initialLang = stored ? normalizeLang(stored) : browserLang;
 
@@ -796,7 +911,9 @@
   const input = document.getElementById("ai-input");
   const sendButton = document.getElementById("ai-send");
   const fileInput = document.getElementById("ai-file");
+  const fileButton = document.getElementById("ai-file-button");
   const imageInput = document.getElementById("ai-image");
+  const imageButton = document.getElementById("ai-image-button");
   const fileStatus = document.getElementById("ai-file-status");
   const conversationMessages = [];
   const MAX_HISTORY_MESSAGES = 10;
@@ -876,6 +993,34 @@
     }
     fileStatus.textContent = text || "";
     fileStatus.style.color = isError ? "var(--error-text)" : "";
+  }
+
+  function disableAiFeaturesIfNeeded() {
+    if (IS_API_CONFIGURED) {
+      return;
+    }
+
+    [input, sendButton, fileButton, imageButton].forEach((control) => {
+      if (control) {
+        control.disabled = true;
+      }
+    });
+    if (form) {
+      form.setAttribute("aria-disabled", "true");
+    }
+    setFileStatus(t("aiUnavailable"), true);
+  }
+
+  if (fileButton && fileInput) {
+    fileButton.addEventListener("click", () => {
+      fileInput.click();
+    });
+  }
+
+  if (imageButton && imageInput) {
+    imageButton.addEventListener("click", () => {
+      imageInput.click();
+    });
   }
 
   function isSupportedTextFile(file) {
@@ -1098,6 +1243,9 @@
         try {
           const originalDataUrl = String(reader.result || "");
           const processedDataUrl = await preprocessImageForOcr(originalDataUrl);
+          if (!IS_API_CONFIGURED) {
+            throw new Error(t("aiUnavailable"));
+          }
           const response = await fetch(buildApiUrl("/api/vision-ocr"), {
             method: "POST",
             headers: {
@@ -1117,7 +1265,6 @@
           }
 
           const limited = cleaned.slice(0, MAX_FILE_CONTEXT_CHARS);
-          console.log("OCR preview:", limited);
           fileContext = {
             sourceType: "ocr",
             filename: file.name,
@@ -1143,7 +1290,10 @@
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const message = input.value.trim();
-      if (!message) {
+      if (!message || !IS_API_CONFIGURED) {
+        if (!IS_API_CONFIGURED) {
+          setFileStatus(t("aiUnavailable"), true);
+        }
         return;
       }
 
@@ -1192,4 +1342,5 @@
     });
   }
   setLanguage(initialLang, false);
+  disableAiFeaturesIfNeeded();
 })();

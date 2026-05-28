@@ -60,6 +60,7 @@ function extractText(data) {
 }
 
 async function callDashScope(model, imageDataUrl) {
+  const startedAt = Date.now();
   const response = await fetch(DASHSCOPE_API_URL, {
     method: "POST",
     headers: {
@@ -92,7 +93,7 @@ async function callDashScope(model, imageDataUrl) {
   console.info("Vision OCR response", {
     model,
     status: response.status,
-    preview: responseText.slice(0, 200)
+    durationMs: Date.now() - startedAt
   });
 
   return { response, responseText };
