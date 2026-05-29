@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -3692,32 +3692,16 @@
     <div class="config-card">
       <div class="config-title">AI 配置</div>
       <div class="config-tip">
-        这里保存 API 地址、模型名和开关项。配置会保存在当前浏览器本地。<br>
-        如果接口是兼容 OpenAI Chat Completions 的地址，填到这里就能直接调用。
+        AI 请求会通过本站后端代理发送，不需要在浏览器里填写或保存 API Key。<br>
+        这里只保存显示、音效和自动分析等本地偏好。
       </div>
       <div class="config-grid">
-        <div class="config-field">
-          <label for="cfgProviderPreset">AI 预设</label>
-          <select id="cfgProviderPreset"></select>
-        </div>
-        <div class="config-field">
-          <label for="cfgApiUrl">API 网址</label>
-          <input id="cfgApiUrl" type="text" placeholder="例如：https://dashscope.aliyuncs.com/compatible-mode/v1" />
-        </div>
-        <div class="config-field">
-          <label for="cfgAiName">AI 名字 / 模型名</label>
-          <input id="cfgAiName" type="text" placeholder="例如：qwen-plus" />
-        </div>
         <div class="config-field">
           <label for="cfgThinkingType">自动思考</label>
           <select id="cfgThinkingType">
             <option value="disabled">关闭自动思考（更快）</option>
             <option value="enabled">开启自动思考（更稳）</option>
           </select>
-        </div>
-        <div class="config-field">
-          <label for="cfgApiKey">API Key</label>
-          <input id="cfgApiKey" type="password" placeholder="填入你的 API Key" />
         </div>
         <div class="config-switches">
           <label class="config-switch">
@@ -3737,8 +3721,7 @@
             <input id="cfgAutoReview" type="checkbox" />
           </label>
         </div>
-      </div>
-      <div class="config-actions">
+      </div>      <div class="config-actions">
         <button class="btn-config-close" id="btnConfigClose">关闭</button>
         <button class="btn-config-save" id="btnConfigSave">保存配置</button>
       </div>
@@ -3748,70 +3731,70 @@
   <script src="./game.js"></script>
   <script>
     const CARD_IMAGES = {
-      "2方": "./牌组/Diamond2.gif",
-      "2梅": "./牌组/Club2.gif",
-      "2红": "./牌组/Heart2.gif",
-      "2黑": "./牌组/Spade2.gif",
-      "3方": "./牌组/Diamond3.gif",
-      "3梅": "./牌组/Club3.gif",
-      "3红": "./牌组/Heart3.gif",
-      "3黑": "./牌组/Spade3.gif",
-      "4方": "./牌组/Diamond4.gif",
-      "4梅": "./牌组/Club4.gif",
-      "4红": "./牌组/Heart4.gif",
-      "4黑": "./牌组/Spade4.gif",
-      "5方": "./牌组/Diamond5.gif",
-      "5梅": "./牌组/Club5.gif",
-      "5红": "./牌组/Heart5.gif",
-      "5黑": "./牌组/Spade5.gif",
-      "6方": "./牌组/Diamond6.gif",
-      "6梅": "./牌组/Club6.gif",
-      "6红": "./牌组/Heart6.gif",
-      "6黑": "./牌组/Spade6.gif",
-      "7方": "./牌组/Diamond7.gif",
-      "7梅": "./牌组/Club7.gif",
-      "7红": "./牌组/Heart7.gif",
-      "7黑": "./牌组/Spade7.gif",
-      "8方": "./牌组/Diamond8.gif",
-      "8梅": "./牌组/Club8.gif",
-      "8红": "./牌组/Heart8.gif",
-      "8黑": "./牌组/Spade8.gif",
-      "9方": "./牌组/Diamond9.gif",
-      "9梅": "./牌组/Club9.gif",
-      "9红": "./牌组/Heart9.gif",
-      "9黑": "./牌组/Spade9.gif",
-      "10方": "./牌组/Diamond10.gif",
-      "10梅": "./牌组/Club10.gif",
-      "10红": "./牌组/Heart10.gif",
-      "10黑": "./牌组/Spade10.gif",
-      "J方": "./牌组/DiamondJ.gif",
-      "J梅": "./牌组/ClubJ.gif",
-      "J红": "./牌组/HeartJ.gif",
-      "J黑": "./牌组/SpadeJ.gif",
-      "Q方": "./牌组/DiamondQ.gif",
-      "Q梅": "./牌组/ClubQ.gif",
-      "Q红": "./牌组/HeartQ.gif",
-      "Q黑": "./牌组/SpadeQ.gif",
-      "K方": "./牌组/DiamondK.gif",
-      "K梅": "./牌组/ClubK.gif",
-      "K红": "./牌组/HeartK.gif",
-      "K黑": "./牌组/SpadeK.gif",
-      "A方": "./牌组/DiamondA.gif",
-      "A梅": "./牌组/ClubA.gif",
-      "A红": "./牌组/HeartA.gif",
-      "A黑": "./牌组/SpadeA.gif",
-      "小王": "./牌组/JOKER-B.gif",
-      "大王": "./牌组/JOKER-A.gif"
+      "2方": "./cards/Diamond2.gif",
+      "2梅": "./cards/Club2.gif",
+      "2红": "./cards/Heart2.gif",
+      "2黑": "./cards/Spade2.gif",
+      "3方": "./cards/Diamond3.gif",
+      "3梅": "./cards/Club3.gif",
+      "3红": "./cards/Heart3.gif",
+      "3黑": "./cards/Spade3.gif",
+      "4方": "./cards/Diamond4.gif",
+      "4梅": "./cards/Club4.gif",
+      "4红": "./cards/Heart4.gif",
+      "4黑": "./cards/Spade4.gif",
+      "5方": "./cards/Diamond5.gif",
+      "5梅": "./cards/Club5.gif",
+      "5红": "./cards/Heart5.gif",
+      "5黑": "./cards/Spade5.gif",
+      "6方": "./cards/Diamond6.gif",
+      "6梅": "./cards/Club6.gif",
+      "6红": "./cards/Heart6.gif",
+      "6黑": "./cards/Spade6.gif",
+      "7方": "./cards/Diamond7.gif",
+      "7梅": "./cards/Club7.gif",
+      "7红": "./cards/Heart7.gif",
+      "7黑": "./cards/Spade7.gif",
+      "8方": "./cards/Diamond8.gif",
+      "8梅": "./cards/Club8.gif",
+      "8红": "./cards/Heart8.gif",
+      "8黑": "./cards/Spade8.gif",
+      "9方": "./cards/Diamond9.gif",
+      "9梅": "./cards/Club9.gif",
+      "9红": "./cards/Heart9.gif",
+      "9黑": "./cards/Spade9.gif",
+      "10方": "./cards/Diamond10.gif",
+      "10梅": "./cards/Club10.gif",
+      "10红": "./cards/Heart10.gif",
+      "10黑": "./cards/Spade10.gif",
+      "J方": "./cards/DiamondJ.gif",
+      "J梅": "./cards/ClubJ.gif",
+      "J红": "./cards/HeartJ.gif",
+      "J黑": "./cards/SpadeJ.gif",
+      "Q方": "./cards/DiamondQ.gif",
+      "Q梅": "./cards/ClubQ.gif",
+      "Q红": "./cards/HeartQ.gif",
+      "Q黑": "./cards/SpadeQ.gif",
+      "K方": "./cards/DiamondK.gif",
+      "K梅": "./cards/ClubK.gif",
+      "K红": "./cards/HeartK.gif",
+      "K黑": "./cards/SpadeK.gif",
+      "A方": "./cards/DiamondA.gif",
+      "A梅": "./cards/ClubA.gif",
+      "A红": "./cards/HeartA.gif",
+      "A黑": "./cards/SpadeA.gif",
+      "小王": "./cards/JOKER-B.gif",
+      "大王": "./cards/JOKER-A.gif"
     };
 
     function getCardImage(name) {
       const normalized = String(name || "").trim();
       if (!normalized) return "";
       if (CARD_IMAGES[normalized]) return CARD_IMAGES[normalized];
-      if (normalized === "JOKER-A") return "./牌组/JOKER-A.gif";
-      if (normalized === "JOKER-B") return "./牌组/JOKER-B.gif";
-      if (normalized === "大王") return "./牌组/JOKER-A.gif";
-      if (normalized === "小王") return "./牌组/JOKER-B.gif";
+      if (normalized === "JOKER-A") return "./cards/JOKER-A.gif";
+      if (normalized === "JOKER-B") return "./cards/JOKER-B.gif";
+      if (normalized === "大王") return "./cards/JOKER-A.gif";
+      if (normalized === "小王") return "./cards/JOKER-B.gif";
 
       const zhMatch = normalized.match(/^(10|[2-9JQKA])([梅方红黑])$/);
       if (zhMatch) {
@@ -3825,13 +3808,13 @@
         };
         const suitName = suitMap[suit];
         if (suitName) {
-          return `./牌组/${suitName}${rank}.gif`;
+          return `./cards/${suitName}${rank}.gif`;
         }
       }
 
       const enMatch = normalized.match(/^(Club|Diamond|Heart|Spade)(10|[2-9JQKA])$/);
       if (enMatch) {
-        return `./牌组/${enMatch[1]}${enMatch[2]}.gif`;
+        return `./cards/${enMatch[1]}${enMatch[2]}.gif`;
       }
 
       return "";
@@ -3912,71 +3895,11 @@
     let lastAiSummary = "";
     let lastAiMode = "hint";
 
-    const AI_CONFIG_KEY = "doudizhu_ai_config_v1";
+    const AI_CONFIG_KEY = "doudizhu_ai_config_v2";
+    const LEGACY_AI_CONFIG_KEY = "doudizhu_ai_config_v1";
     const AI_DIFFICULTY_KEY = "doudizhu_ai_difficulty_v1";
     const AI_PLAY_MODE_KEY = "doudizhu_ai_play_mode_v1";
-    const AI_PROVIDER_PRESETS = {
-      custom: {
-        label: "自定义",
-        apiUrl: "",
-        aiName: ""
-      },
-      zhipu_glm_5_1: {
-        label: "智谱 AI / GLM-5.1",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "GLM-5.1"
-      },
-      zhipu_glm_5: {
-        label: "智谱 AI / GLM-5",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "glm-5"
-      },
-      zhipu_glm_5_turbo: {
-        label: "智谱 AI / GLM-5-Turbo",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "glm-5-turbo"
-      },
-      zhipu_glm_4_7: {
-        label: "智谱 AI / GLM-4.7",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "glm-4.7"
-      },
-      zhipu_glm_4_7_flash: {
-        label: "智谱 AI / GLM-4.7-Flash",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "glm-4.7-flash"
-      },
-      zhipu_glm_4_7_flashx: {
-        label: "智谱 AI / GLM-4.7-FlashX",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "glm-4.7-flashx"
-      },
-      zhipu_glm_4_6: {
-        label: "智谱 AI / GLM-4.6",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "glm-4.6"
-      },
-      zhipu_glm_4_5_air: {
-        label: "智谱 AI / GLM-4.5-Air",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "glm-4.5-air"
-      },
-      zhipu_glm_4_5_airx: {
-        label: "智谱 AI / GLM-4.5-AirX",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "glm-4.5-airx"
-      },
-      zhipu_glm_4_5_flash: {
-        label: "智谱 AI / GLM-4.5-Flash",
-        apiUrl: "https://open.bigmodel.cn/api/paas/v4",
-        aiName: "glm-4.5-flash"
-      }
-    };
     const defaultAiConfig = {
-      providerPreset: "custom",
-      apiUrl: "",
-      aiName: "qwen-plus",
-      apiKey: "",
       thinkingType: "disabled",
       showFaces: true,
       bgmEnabled: true,
@@ -4142,48 +4065,40 @@
 
     function readAiConfig() {
       try {
+        localStorage.removeItem(LEGACY_AI_CONFIG_KEY);
         const raw = localStorage.getItem(AI_CONFIG_KEY);
         if (!raw) return { ...defaultAiConfig };
-        return { ...defaultAiConfig, ...JSON.parse(raw) };
+        const parsed = JSON.parse(raw);
+        return {
+          ...defaultAiConfig,
+          thinkingType: parsed.thinkingType === "enabled" ? "enabled" : "disabled",
+          showFaces: parsed.showFaces !== false,
+          bgmEnabled: parsed.bgmEnabled !== false,
+          sfxEnabled: parsed.sfxEnabled !== false,
+          autoReview: !!parsed.autoReview
+        };
       } catch (_) {
         return { ...defaultAiConfig };
       }
     }
 
     function saveAiConfig() {
-      localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(aiConfig));
-    }
-
-    function populateProviderPresetOptions() {
-      const select = document.getElementById("cfgProviderPreset");
-      if (!select) return;
-      select.innerHTML = "";
-      Object.entries(AI_PROVIDER_PRESETS).forEach(([key, preset]) => {
-        const option = document.createElement("option");
-        option.value = key;
-        option.textContent = preset.label;
-        select.appendChild(option);
-      });
+      const safeConfig = {
+        thinkingType: aiConfig.thinkingType === "enabled" ? "enabled" : "disabled",
+        showFaces: !!aiConfig.showFaces,
+        bgmEnabled: !!aiConfig.bgmEnabled,
+        sfxEnabled: !!aiConfig.sfxEnabled,
+        autoReview: !!aiConfig.autoReview
+      };
+      localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(safeConfig));
     }
 
     function syncConfigForm() {
-      document.getElementById("cfgProviderPreset").value = aiConfig.providerPreset || "custom";
-      document.getElementById("cfgApiUrl").value = aiConfig.apiUrl || "";
-      document.getElementById("cfgAiName").value = aiConfig.aiName || "";
       document.getElementById("cfgThinkingType").value = aiConfig.thinkingType || "disabled";
-      document.getElementById("cfgApiKey").value = aiConfig.apiKey || "";
       document.getElementById("cfgShowFaces").checked = !!aiConfig.showFaces;
       document.getElementById("cfgBgmEnabled").checked = !!aiConfig.bgmEnabled;
       document.getElementById("cfgSfxEnabled").checked = !!aiConfig.sfxEnabled;
       document.getElementById("cfgAutoReview").checked = !!aiConfig.autoReview;
-    }
-
-    function applyProviderPresetToForm(presetKey, keepApiKey = true) {
-      const preset = AI_PROVIDER_PRESETS[presetKey] || AI_PROVIDER_PRESETS.custom;
-      document.getElementById("cfgProviderPreset").value = presetKey in AI_PROVIDER_PRESETS ? presetKey : "custom";
-      document.getElementById("cfgApiUrl").value = preset.apiUrl || "";
-      document.getElementById("cfgAiName").value = preset.aiName || "";
-      if (!keepApiKey) document.getElementById("cfgApiKey").value = "";
     }
 
     function applyAiConfig() {
@@ -4218,14 +4133,9 @@
     }
 
     function saveConfigFromForm() {
-      const providerPreset = document.getElementById("cfgProviderPreset").value || "custom";
       aiConfig = {
         ...aiConfig,
-        providerPreset,
-        apiUrl: document.getElementById("cfgApiUrl").value.trim(),
-        aiName: document.getElementById("cfgAiName").value.trim(),
         thinkingType: document.getElementById("cfgThinkingType").value || "disabled",
-        apiKey: document.getElementById("cfgApiKey").value.trim(),
         showFaces: document.getElementById("cfgShowFaces").checked,
         bgmEnabled: document.getElementById("cfgBgmEnabled").checked,
         sfxEnabled: document.getElementById("cfgSfxEnabled").checked,
@@ -4288,7 +4198,7 @@
         msg.className = `ai-chat-msg ${item.role}`;
         const role = document.createElement("span");
         role.className = "ai-chat-role";
-        role.textContent = item.role === "user" ? "你" : (aiConfig.aiName || "AI");
+        role.textContent = item.role === "user" ? "你" : "DeepSeek AI";
         const text = document.createElement("div");
         text.textContent = item.content || "";
         msg.appendChild(role);
@@ -4306,25 +4216,6 @@
       btnAiAction.style.opacity = aiBusy ? "0.72" : "1";
     }
 
-    function normalizeApiEndpoint(baseUrl) {
-      const base = String(baseUrl || "").trim().replace(/\/+$/, "");
-      if (!base) return "";
-      if (/\/chat\/completions$/i.test(base)) return base;
-      return `${base}/chat/completions`;
-    }
-
-    function extractMessageContent(data) {
-      const content = data?.choices?.[0]?.message?.content;
-      if (typeof content === "string") return content;
-      if (Array.isArray(content)) {
-        return content
-          .map(part => typeof part === "string" ? part : part?.text || "")
-          .join("")
-          .trim();
-      }
-      return "";
-    }
-
     function tryParseJsonBlock(text) {
       if (!text) return null;
       try {
@@ -4339,92 +4230,44 @@
       }
     }
 
-    async function requestAiJSON(systemPrompt, userPrompt) {
-      const endpoint = normalizeApiEndpoint(aiConfig.apiUrl);
-      if (!endpoint || !aiConfig.aiName || !aiConfig.apiKey) {
-        throw new Error("请先在配置里填好 API 网址、AI 名字和 API Key。");
-      }
-
-      const payload = {
-        model: aiConfig.aiName,
-        temperature: 0.3,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ]
-      };
-
-      if (String(aiConfig.apiUrl || "").includes("open.bigmodel.cn")) {
-        payload.thinking = {
-          type: aiConfig.thinkingType === "enabled" ? "enabled" : "disabled"
-        };
-      }
-
-      const response = await fetch(endpoint, {
+    async function requestDoudizhuAi(task, payload, options = {}) {
+      const response = await fetch("/api/doudizhu-ai", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${aiConfig.apiKey}`
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          task,
+          payload,
+          question: options.question || "",
+          history: options.history || [],
+          lastAiSummary: options.lastAiSummary || "",
+          mode: options.mode || "",
+          thinkingEnabled: aiConfig.thinkingType === "enabled"
+        })
       });
 
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`接口返回 ${response.status}：${text.slice(0, 240)}`);
-      }
-
-      const data = await response.json();
-      const content = extractMessageContent(data);
-      const parsed = tryParseJsonBlock(content);
-      if (!parsed) {
-        throw new Error("AI 返回的不是有效 JSON。");
-      }
-      return parsed;
-    }
-
-    async function requestAiText(systemPrompt, userPrompt, extraMessages = []) {
-      const endpoint = normalizeApiEndpoint(aiConfig.apiUrl);
-      if (!endpoint || !aiConfig.aiName || !aiConfig.apiKey) {
-        throw new Error("请先在配置里填好 API 网址、AI 名字和 API Key。");
-      }
-
-      const payload = {
-        model: aiConfig.aiName,
-        temperature: 0.35,
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...extraMessages,
-          { role: "user", content: userPrompt }
-        ]
-      };
-
-      if (String(aiConfig.apiUrl || "").includes("open.bigmodel.cn")) {
-        payload.thinking = {
-          type: aiConfig.thinkingType === "enabled" ? "enabled" : "disabled"
-        };
-      }
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${aiConfig.apiKey}`
-        },
-        body: JSON.stringify(payload)
-      });
+      let data = null;
+      try {
+        data = await response.json();
+      } catch (_) {}
 
       if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`接口返回 ${response.status}：${text.slice(0, 240)}`);
+        throw new Error(data?.error || `AI 服务暂时不可用（${response.status}）。`);
       }
 
-      const data = await response.json();
-      const content = extractMessageContent(data);
+      if (options.expectJson) {
+        if (data?.result && typeof data.result === "object") return data.result;
+        const parsed = tryParseJsonBlock(data?.text || "");
+        if (!parsed) throw new Error("AI 返回的不是有效 JSON。");
+        return parsed;
+      }
+
+      const content = String(data?.text || "").trim();
       if (!content) {
         throw new Error("AI 没有返回可读文本。");
       }
-      return content.trim();
+      return content;
     }
 
     function summarizeCurrentState(state) {
@@ -5152,38 +4995,7 @@
     }
 
     async function requestAiPlayDecision() {
-      const payload = buildAiPlayPayload();
-      const systemPrompt = [
-        "你是斗地主双电脑联合出牌代理。",
-        "你必须只输出 JSON，不要输出 markdown，不要解释额外文字。",
-        "你必须严格遵守斗地主规则。",
-        "你会看到整桌明牌信息，尤其是 ai1 和 ai2 两个电脑的完整手牌。",
-        "请直接规划从当前电脑回合开始、直到轮到玩家之前的连续动作，优先一次返回完整链路，最多两步。",
-        "每一步都必须是合法动作：play 或 pass。",
-        "如果输出 play，cards 必须严格取自对应 actor 的手牌，不能杜撰。",
-        "跟牌时不能按花色比较，也不能出相同点数去压上家；点数必须严格更大。",
-        "如果上家出了单张3，你不能再出任何3去压；只能出更大的单张，或者 pass，或者炸弹/王炸。",
-        "如果上家出了单张5，你不能再出任何5去压；只能出6及以上的单张，或者 pass，或者炸弹/王炸。",
-        "如果当前是新一轮先手，第一步不能输出 pass。",
-        "如果当前电脑出牌后，在轮到玩家前还会轮到另一名电脑，则应继续规划第二步，而不是只给一步。",
-        "农民阵营时要考虑两个电脑之间的配合，不要无意义地压队友。",
-        "字段必须包含：steps。每个 step 必须包含 actor、action、cards、reason。"
-      ].join("");
-      const userPrompt = [
-        "请为两个电脑规划接下来直到轮到玩家前的连续动作。",
-        "要求：",
-        "1. 返回 JSON 结构：{\"steps\":[...]}。",
-        "2. 每个 step 的 actor 只能是 1 或 2，表示电脑1/电脑2。",
-        "3. action 只能是 play 或 pass。",
-        "4. cards 必须是要出的完整牌组；如果 action=pass，cards 返回空数组。",
-        "5. 如果压不过上家，就输出 pass；但当前不能 pass 的那一步必须给出一手可出的牌。",
-        "6. 如果当前 actor 之后紧接着就是玩家，则 steps 只返回一步；如果还会轮到另一个电脑，必须直接返回两步。",
-        "7. 你已经拿到了 ai1 和 ai2 的完整手牌，请把两个电脑当作联合规划，不要只看当前 actor。",
-        "8. 这是斗地主规则：不能用同点数单张去压单张，不能用同点数对子去压对子，不能按花色大小判断。",
-        "",
-        JSON.stringify(payload, null, 2)
-      ].join("\n");
-      return requestAiJSON(systemPrompt, userPrompt);
+      return requestDoudizhuAi("play", buildAiPlayPayload(), { expectJson: true });
     }
 
     function cardsToIndices(hand, cards) {
@@ -5284,54 +5096,14 @@
     async function requestAiHint() {
       if (!gameState) throw new Error("请先开始游戏。");
       if (!gameState.landlordRobbed) throw new Error("现在还是抢地主阶段，等进入出牌阶段再问我。");
-
-      const payload = buildHintPayload();
-      const systemPrompt = [
-        "你是斗地主出牌建议助手。",
-        "请基于用户当前局面输出 JSON。",
-        "只输出 JSON，不要额外解释。",
-        "你必须先检查用户当前所选牌能不能压过上家，不能压过时要明确指出不能出这手。",
-        "如果当前选择压不过上家，不要假装它可行，必须改为推荐可行方案或建议过牌。",
-        "字段必须包含：recommended_play、why_recommended、avoid_bomb_reason、style、selected_is_playable、selected_problem。"
-      ].join("");
-      const userPrompt = [
-        "请结合当前局势和用户已选牌，回答：",
-        "1. 为什么推荐这手牌；",
-        "2. 为什么不建议现在出炸弹；",
-        "3. 当前局势更偏保守还是进攻。",
-        "如果用户没选牌，请先给出推荐动作。",
-        "如果用户已选牌但它压不过上家，请明确指出压不过，并说明是牌型不对、长度不对还是点数不够。",
-        "判断时优先参考 payload 里的 beatCheck 和 selectedMeta，不要忽略硬规则。",
-        "",
-        JSON.stringify(payload, null, 2)
-      ].join("\n");
-
-      return requestAiJSON(systemPrompt, userPrompt);
+      return requestDoudizhuAi("hint", buildHintPayload(), { expectJson: true });
     }
 
     async function requestAiReview() {
       if (!gameState || !gameState.gameOver) {
         throw new Error("这局还没结束，暂时不能做赛后复盘。");
       }
-
-      const payload = buildReviewPayload();
-      const systemPrompt = [
-        "你是斗地主赛后复盘助手。",
-        "请基于整局回放输出 JSON。",
-        "只输出 JSON，不要额外解释。",
-        "字段必须包含：关键转折点、错失最优出牌、高风险操作、胜负原因总结。"
-      ].join("");
-      const userPrompt = [
-        "请复盘这局斗地主，输出四个部分：",
-        "1. 关键转折点",
-        "2. 错失最优出牌",
-        "3. 高风险操作",
-        "4. 胜负原因总结",
-        "",
-        JSON.stringify(payload, null, 2)
-      ].join("\n");
-
-      return requestAiJSON(systemPrompt, userPrompt);
+      return requestDoudizhuAi("review", buildReviewPayload(), { expectJson: true });
     }
 
     function normalizeToList(value) {
@@ -5353,7 +5125,7 @@
       }];
       showAiPanel(
         "AI 提示",
-        `${aiConfig.aiName || "AI"} 给你的当前回合建议`,
+        "DeepSeek AI 给你的当前回合建议",
         [
           { title: "当前所选是否可出", content: `${selectedPlayable}${result.selected_problem ? `：${result.selected_problem}` : ""}` },
           { title: "推荐动作", content: recommended },
@@ -5374,7 +5146,7 @@
       }];
       showAiPanel(
         "AI 分析",
-        `${aiConfig.aiName || "AI"} 给出的赛后复盘`,
+        "DeepSeek AI 给出的赛后复盘",
         [
           { title: "关键转折点", content: normalizeToList(result["关键转折点"] || result.key_turning_points || result.turning_points) },
           { title: "错失最优出牌", content: normalizeToList(result["错失最优出牌"] || result.missed_best_play) },
@@ -5393,34 +5165,21 @@
       }
 
       const statePayload = lastAiMode === "review" ? buildReviewPayload() : buildHintPayload();
-      const systemPrompt = [
-        "你是斗地主 AI 助手的追问对话模式。",
-        "你必须只围绕当前牌局、上一轮分析结果和用户问题回答。",
-        "如果上一轮分析有问题，应直接纠正，不要强行圆回来。",
-        "回答要具体，优先说明为什么、压不压得过、还有哪些备选。"
-      ].join("");
-
       const historyMessages = aiConversation.slice(-6).map(item => ({
         role: item.role === "assistant" ? "assistant" : "user",
         content: item.content
       }));
 
-      const userPrompt = [
-        `当前模式：${lastAiMode === "review" ? "赛后复盘追问" : "局中提示追问"}`,
-        "上一轮 AI 输出：",
-        lastAiSummary || "无",
-        "",
-        "当前牌局 / 回放上下文：",
-        JSON.stringify(statePayload, null, 2),
-        "",
-        `用户追问：${question}`
-      ].join("\n");
-
       aiConversation.push({ role: "user", content: question });
       renderAiConversation();
       aiChatInput.value = "";
 
-      const answer = await requestAiText(systemPrompt, userPrompt, historyMessages);
+      const answer = await requestDoudizhuAi("followup", statePayload, {
+        question,
+        history: historyMessages,
+        lastAiSummary,
+        mode: lastAiMode
+      });
       aiConversation.push({ role: "assistant", content: answer });
       renderAiConversation();
     }
@@ -5948,10 +5707,6 @@
       document.getElementById("btnConfig").onclick = () => openConfigModal();
       document.getElementById("btnConfigClose").onclick = () => closeConfigModal();
       document.getElementById("btnConfigSave").onclick = () => saveConfigFromForm();
-      document.getElementById("cfgProviderPreset").onchange = (e) => {
-        const presetKey = e.target.value || "custom";
-        applyProviderPresetToForm(presetKey, true);
-      };
       document.getElementById("btnRefresh").onclick = () => {
         if (!wasmModule) return;
         renderAll();
@@ -5993,10 +5748,6 @@
       aiConfig = readAiConfig();
       aiDifficultyLevel = readAiDifficulty();
       aiPlayMode = readAiPlayMode();
-      if (!AI_PROVIDER_PRESETS[aiConfig.providerPreset]) {
-        aiConfig.providerPreset = "custom";
-      }
-      populateProviderPresetOptions();
       applyAiConfig();
 
       if (typeof GameModule === "function") {
@@ -6037,3 +5788,4 @@
   </script>
 </body>
 </html>
+
